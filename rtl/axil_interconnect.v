@@ -31,7 +31,7 @@ THE SOFTWARE.
 /*
  * AXI4 lite interconnect
  */
-module axil_interconnect #
+ module axil_interconnect #
 (
     // Number of AXI inputs (slave interfaces)
     parameter S_COUNT = 4,
@@ -47,20 +47,19 @@ module axil_interconnect #
     parameter M_REGIONS = 1,
     // Master interface base addresses
     // M_COUNT concatenated fields of M_REGIONS concatenated fields of ADDR_WIDTH bits
-    // set to zero for default addressing based on M_ADDR_WIDTH
-    parameter M_BASE_ADDR = 0,
+    parameter [M_COUNT*M_REGIONS*ADDR_WIDTH-1:0] M_BASE_ADDR     = 0,
     // Master interface address widths
     // M_COUNT concatenated fields of M_REGIONS concatenated fields of 32 bits
-    parameter M_ADDR_WIDTH = {M_COUNT{{M_REGIONS{32'd24}}}},
+    parameter [M_COUNT*M_REGIONS*32-1:0]         M_ADDR_WIDTH    = {M_COUNT{{M_REGIONS{32'd24}}}},
     // Read connections between interfaces
     // M_COUNT concatenated fields of S_COUNT bits
-    parameter M_CONNECT_READ = {M_COUNT{{S_COUNT{1'b1}}}},
+    parameter [M_COUNT*S_COUNT-1:0]              M_CONNECT_READ  = {M_COUNT{{S_COUNT{1'b1}}}},
     // Write connections between interfaces
     // M_COUNT concatenated fields of S_COUNT bits
-    parameter M_CONNECT_WRITE = {M_COUNT{{S_COUNT{1'b1}}}},
+    parameter [M_COUNT*S_COUNT-1:0]              M_CONNECT_WRITE = {M_COUNT{{S_COUNT{1'b1}}}},
     // Secure master (fail operations based on awprot/arprot)
     // M_COUNT bits
-    parameter M_SECURE = {M_COUNT{1'b0}}
+    parameter [M_COUNT-1:0]                      M_SECURE        = {M_COUNT{1'b0}}
 )
 (
     input  wire                           clk,
@@ -339,7 +338,7 @@ genvar n;
 
 // request generation
 generate
-for (n = 0; n < S_COUNT; n = n + 1) begin
+for (n = 0; n < S_COUNT; n = n + 1) begin : generate_request
     assign request[2*n]   = s_axil_awvalid[n];
     assign request[2*n+1] = s_axil_arvalid[n];
 end
@@ -347,7 +346,7 @@ endgenerate
 
 // acknowledge generation
 generate
-for (n = 0; n < S_COUNT; n = n + 1) begin
+for (n = 0; n < S_COUNT; n = n + 1) begin : generate_acknowledge
     assign acknowledge[2*n]   = grant[2*n]   && s_axil_bvalid[n] && s_axil_bready[n];
     assign acknowledge[2*n+1] = grant[2*n+1] && s_axil_rvalid[n] && s_axil_rready[n];
 end
