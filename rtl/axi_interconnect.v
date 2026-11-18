@@ -70,21 +70,21 @@ module axi_interconnect #
     // Number of regions per master interface
     parameter M_REGIONS = 1,
     // Master interface base addresses
-    // M_COUNT concatenated fields of M_REGIONS concatenated fields of ADDR_WIDTH bits
-    // set to zero for default addressing based on M_ADDR_WIDTH
-    parameter M_BASE_ADDR = 0,
+    // M_COUNT concatenated fields of M_REGIONS concatenated fields of ADDR_WIDTH bitsenated fields of ADDR_WIDTH bits
+    // (widened from integer to [N-1:0])DDR_WIDTH
+    parameter [M_COUNT*M_REGIONS*ADDR_WIDTH-1:0] M_BASE_ADDR = 0,
     // Master interface address widths
-    // M_COUNT concatenated fields of M_REGIONS concatenated fields of 32 bits
-    parameter M_ADDR_WIDTH = {M_COUNT{{M_REGIONS{32'd24}}}},
+    // M_COUNT concatenated fields of M_REGIONS concatenated fields of 32 bitsenated fields of 32 bits
+    parameter [M_COUNT*M_REGIONS*32-1:0]         M_ADDR_WIDTH = {M_COUNT{{M_REGIONS{32'd24}}}},4}}}},
     // Read connections between interfaces
     // M_COUNT concatenated fields of S_COUNT bits
-    parameter M_CONNECT_READ = {M_COUNT{{S_COUNT{1'b1}}}},
+    parameter [M_COUNT*S_COUNT-1:0]              M_CONNECT_READ = {M_COUNT{{S_COUNT{1'b1}}}},}}},
     // Write connections between interfaces
     // M_COUNT concatenated fields of S_COUNT bits
-    parameter M_CONNECT_WRITE = {M_COUNT{{S_COUNT{1'b1}}}},
-    // Secure master (fail operations based on awprot/arprot)
+    parameter [M_COUNT*S_COUNT-1:0]              M_CONNECT_WRITE = {M_COUNT{{S_COUNT{1'b1}}}},}}}},
+    // Secure master (fail operations based on awprot/arprot)arprot)
     // M_COUNT bits
-    parameter M_SECURE = {M_COUNT{1'b0}}
+    parameter [M_COUNT-1:0]                      M_SECURE = {M_COUNT{1'b0}}
 )
 (
     input  wire                            clk,
